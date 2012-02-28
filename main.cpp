@@ -11,56 +11,56 @@
 #include <stdio.h>
 #include <time.h>
 #include <ctime>
-//#include <boost/thread.hpp>
+#include <boost/thread.hpp>
 using namespace std;
 
 void initial(int &height, int &width);
 double timer(bool on_or_off);
-double kernel_filter(int matrix[], int transform_matrix[], bool dx_matrix);
+void kernel_filter(int matrix[], int transform_matrix[], bool dx_matrix);
 void print_matrix(int matrix[]);
-double compute_min_and_max(int matrix[]);
+void compute_min_and_max(int matrix[]);
 
 int height,width;
-
 
 int main ()
 {
     int a;
     bool start=true, stop=false;
+    int * matrix;
+    int * dx_matrix;
+    int * dy_matrix;
     
     height = 0;
     width = 0;
     initial(height, width);
     
-    int matrix[height*width];
-    int dx_matrix[height*width];
-    int dy_matrix[height*width];
+    matrix = new int [height*width];
+    dx_matrix = new int [height*width];
+    dy_matrix = new int [height*width];
     
+    delete[] matrix;
+    delete[] dx_matrix;
+    delete[] dy_matrix;
+
     cout << "fill with random data \n";
+    srand((unsigned)time(0)); 
     for(a=0;a<height*width;a++)
             matrix[a] = rand() % 10;
     
-    cout << "print matrix\n";
-    //print_matrix(matrix);           //Print Random Matrix || Only For Me Test Code
     
-    cout << "kernel filter\n";
     timer(start);
-    kernel_filter(matrix, dx_matrix, true);    //dx_matrix
-    kernel_filter(matrix, dy_matrix, false);   //dy_matrix
-    cout << "This is the time taken=" << timer(stop);
+        cout << "kernel filter\n";
+        kernel_filter(matrix, dx_matrix, true);    //dx_matrix
+        kernel_filter(matrix, dy_matrix, false);   //dy_matrix
+    cout << "This is the time taken=" << timer(stop) << endl;
+
     
-    cout << "This is the transformed dx matrix\n";
-    //print_matrix(dx_matrix);
-    cout << "This is the transformed dy matrix\n";
-    //print_matrix(dy_matrix);
-    
-    
-    cout << "compute min and max\n";
     timer(start);
-    compute_min_and_max(dx_matrix);
-    compute_min_and_max(dy_matrix);
-    cout << "This is the time taken=" << timer(stop);
-//  Print Total Time Taken t compy dx, dy, min and max operations
+        cout << "compute min and max\n";
+        compute_min_and_max(dx_matrix);
+        compute_min_and_max(dy_matrix);
+    cout << "This is the time taken=" << timer(stop) << endl;
+
     return 0;
 }
 
@@ -108,7 +108,7 @@ double timer(bool on){
     return timeCount;
 }
 
-double kernel_filter(int matrix[], int transform_matrix[], bool dx_matrix){
+void kernel_filter(int matrix[], int transform_matrix[], bool dx_matrix){
     int a, b, c, temp,x1, x2, x3, y1, y2, y3;
     char kernel[3] = {-1, 0, 1};
     int value_array[height*width];
@@ -152,10 +152,9 @@ double kernel_filter(int matrix[], int transform_matrix[], bool dx_matrix){
         }
 
     }
-    return 0;
 }
 
-double compute_min_and_max(int matrix[]){
+void compute_min_and_max(int matrix[]){
     int max_val1;
     int min_val1;
     int a;
@@ -169,5 +168,4 @@ double compute_min_and_max(int matrix[]){
     }
     cout << "The min value is equal to " << min_val1 << endl;
     cout << "The max value is equal to " << max_val1 << endl;
-    return 0;
 }
