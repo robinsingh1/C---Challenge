@@ -54,8 +54,8 @@ int main (int argc, char ** argv)
     transpose(matrix_dy, dy_matrix);
     
 		print_matrix(dy_matrix);
- 	  boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
-    boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
+		boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
+		boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
     workerone.join();
     workertwo.join();
     
