@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-//#include <boost/thread.hpp>
-//#include <boost/timer/timer.hpp>
+#include <boost/thread.hpp>
+#include <boost/timer/timer.hpp>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,7 +40,6 @@ int main (int argc, char ** argv)
     dx_matrix = new int [height*width];
     dy_matrix = new int [height*width];
     
-
     fill_with_random_data(matrix_dx, matrix_dy);
     print_matrix(matrix_dx);
     
@@ -52,35 +51,35 @@ int main (int argc, char ** argv)
     
     cout << "Transpose Matrix \n";
     transpose(matrix_dy, dy_matrix);
-    //print_matrix(dy_matrix);
-    cout << "boost\n";
+    print_matrix(dy_matrix);
+ 	  boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
+    boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
+    workerone.join();
+    workertwo.join();
     
-//   boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
-//   boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
-//   workerone.join();
-//   workertwo.join();
-    
-	kernel_filter(matrix_dx, dx_matrix);
-    
+		//kernel_filter(matrix_dx, dx_matrix);
     //kernel_filter(dy_matrix, matrix_dy);
+
     // kernel filter is applied along a transposed matrix(dy_matrix)
     // values stored in junk_matrix(matrix_dy)
     // matrix_dy is untransposed values place in dy_matrix;
     cout << "Untranspose Matrix\n";
-    transpose(matrix_dy,dy_matrix);
-    print_matrix(matrix_dy);
-	//untranspose(matrix_dy, dy_matrix);
+    transpose(matrix_dy, dy_matrix);
+    
+		//print_matrix(matrix_dy);  <-  Matrix that needs to be untransposed
+  	//print_matrix(dy_matrix);
+		//untranspose(matrix_dy, dy_matrix);
     cout << "dx_matrix\n";
     print_matrix(dx_matrix);
     cout << "\ndy_matrix\n";
     print_matrix(dy_matrix);
     cout << "compute min and max\n";
-        //boost::thread workerthree(compute_min_and_max,dx_matrix);
-        //boost::thread workerfour(compute_min_and_max,dy_matrix);
-        //workerthree.join();
-        //workerfour.join();
-	compute_min_and_max(dx_matrix);
-	compute_min_and_max(dy_matrix);
+    boost::thread workerthree(compute_min_and_max,dx_matrix);
+    boost::thread workerfour(compute_min_and_max,dy_matrix);
+    workerthree.join();
+    workerfour.join();
+//	compute_min_and_max(dx_matrix);
+	//compute_min_and_max(dy_matrix);
     
     delete[] matrix_dx;
     delete[] matrix_dy;
@@ -137,10 +136,10 @@ void transpose(int transpose_matrix[], int transposed_matrix[]){
 	for(a=0;a<height*width;a++){
 		if(a%width==0){
 			b=0;
-            c++;
-        }
+      c++;
+    }
 		transposed_matrix[a] = transpose_matrix[b*height+(c-1)];
-        b++;
+    b++;
 	}
 }
 
@@ -150,7 +149,7 @@ void kernel_filter(int matrix[], int transform_matrix[]){
     int kernel[3] = {-1, 0, 1};
 
     for (a=0;a<height*width; a++){
-        x1 = (a%width==0) ? 0 : kernel[0] * matrix[a];
+        x1 = (a%width==0) ? 0 : kernel[0] * matrix[a-1];
         x2 = kernel[1] * matrix[a];
         x3 = (a%width==width-1) ? 0 : kernel[2] * matrix[a+1];
 
