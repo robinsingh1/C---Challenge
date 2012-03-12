@@ -30,9 +30,10 @@ int * dy_matrix;
 //char kernel[3]={-1,0,1};
 int main (int argc, char ** argv)
 {
+    // Obtain Height and Width of The Matrix
     initial(height, width);
-		
-		int * matrix_dx;
+    		
+    int * matrix_dx;
     int * matrix_dy;
     int * dx_matrix;
     
