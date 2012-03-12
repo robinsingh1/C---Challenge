@@ -17,8 +17,7 @@
 using namespace std;
 
 void initial(int &height, int &width);
-void transpose(int matrix[], int transpose_matrix[]);
-void untranspose(int matrix[], int transpose_matrix[]);
+void transpose(int matrix[]);
 void kernel_filter(int matrix[], int transform_matrix[]);
 void print_matrix(int matrix[]);
 void fill_with_random_data(int matrix_dx[], int matrix_dy[]);
@@ -27,32 +26,29 @@ void compute_min_and_max(int matrix[]);
 int height=0;
 int width=0;
 int * dy_matrix;
-//char kernel[3]={-1,0,1};
 int main (int argc, char ** argv)
 {
-    // Obtain Height and Width of The Matrix
-    initial(height, width);
+    initial(height, width); //Ask user to enter size of the matrix
     		
-    int * matrix_dx;
-    int * matrix_dy;
+    int * matrix; //matrix
+    int * matrix_transpose; //matrix_transpose
     int * dx_matrix;
     
-    matrix_dx = new int [height*width];
-    matrix_dy = new int [height*width];
+    matrix = new int [height*width];
+    matrix_transpose = new int [height*width];
     dx_matrix = new int [height*width];
     dy_matrix = new int [height*width];
     
-    fill_with_random_data(matrix_dx, matrix_dy);
-    print_matrix(matrix_dx);
-    
+    fill_with_random_data(matrix, matrix_transpose);
+    print_matrix(matrix);
   
     cout << "Transpose Matrix \n";
-    transpose(matrix_dy, dy_matrix);
-    
+    transpose(matrix_transpose);
     print_matrix(dy_matrix);
+    
     cout << "kernel filter\n";
-    boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
-    boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
+    boost::thread workerone(kernel_filter, matrix, dx_matrix);
+    boost::thread workertwo(kernel_filter, matrix_transpose, dy_matrix);
     workerone.join();
     workertwo.join();
 
@@ -61,21 +57,21 @@ int main (int argc, char ** argv)
     // matrix_dy is untransposed values place in dy_matrix;
     
     cout << "Untranspose Matrix\n";
-    transpose(matrix_dy, dy_matrix);
-  
+    transpose(dy_matrix);
+    
     cout << "dx_matrix\n";
     print_matrix(dx_matrix);
     cout << "\ndy_matrix\n";
     print_matrix(dy_matrix);
     
     cout << "compute min and max\n";
-    boost::thread workerthree(compute_min_and_max,dx_matrix);
+    boost::thread workerthree(compute_min_and_max , dx_matrix);
     boost::thread workerfour(compute_min_and_max,dy_matrix);
     workerthree.join();
     workerfour.join();
     
-    delete[] matrix_dx;
-    delete[] matrix_dy;
+    delete[] matrix;
+    delete[] matrix_transpose;
     delete[] dx_matrix;
     delete[] dy_matrix;
     return 0;
@@ -121,18 +117,22 @@ void print_matrix(int matrix[]){
     }
 }
 
-void transpose(int transpose_matrix[], int transposed_matrix[]){
+void transpose(int matrix[]){
 	int a, b, c; 			/* Counters */
-	b = 0;				/* Column # */
-  c = 0;				/* Row #    */
+	b = 0;				    /* Column # */
+    c = 0;				    /* Row #    */
+    int * junk_matrix;
+    junk_matrix = new int [height*width];
 	for(a=0;a<height*width;a++){
 		if(a%width==0){
 			b=0;
-  	  c++;
-  	}
-		transposed_matrix[a] = transpose_matrix[b*height+(c-1)];
-    b++;
+            c++;
+        }
+		junk_matrix[a] = matrix[b*height+(c-1)];
+        b++;
 	}
+    for(a=0;a<height*width;a++)
+        matrix[a] = junk_matrix[a];
 }
 
 void kernel_filter(int matrix[], int transform_matrix[]){
