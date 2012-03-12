@@ -6,8 +6,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#include <boost/thread.hpp>
-#include <boost/timer/timer.hpp>
+//#include <boost/thread.hpp>
+//#include <boost/timer/timer.hpp>
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -30,6 +30,7 @@ int * dy_matrix;
 //char kernel[3]={-1,0,1};
 int main (int argc, char ** argv)
 {
+    initial(height, width);
     int * matrix_dx;
     int * matrix_dy;
     int * dx_matrix;
@@ -39,7 +40,7 @@ int main (int argc, char ** argv)
     dx_matrix = new int [height*width];
     dy_matrix = new int [height*width];
     
-    initial(height, width);
+
     fill_with_random_data(matrix_dx, matrix_dy);
     print_matrix(matrix_dx);
     
@@ -50,18 +51,24 @@ int main (int argc, char ** argv)
     // matrix_dy original but junk
     
     cout << "Transpose Matrix \n";
-//   transpose(matrix_dy, dy_matrix);
+    transpose(matrix_dy, dy_matrix);
+    //print_matrix(dy_matrix);
     cout << "boost\n";
+    
 //   boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
-//    boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
-//    workerone.join();
-//    workertwo.join();
-		kernel_filter(matrix_dx, dx_matrix);
+//   boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
+//   workerone.join();
+//   workertwo.join();
+    
+	kernel_filter(matrix_dx, dx_matrix);
+    
     //kernel_filter(dy_matrix, matrix_dy);
     // kernel filter is applied along a transposed matrix(dy_matrix)
     // values stored in junk_matrix(matrix_dy)
     // matrix_dy is untransposed values place in dy_matrix;
     cout << "Untranspose Matrix\n";
+    transpose(matrix_dy,dy_matrix);
+    print_matrix(matrix_dy);
 	//untranspose(matrix_dy, dy_matrix);
     cout << "dx_matrix\n";
     print_matrix(dx_matrix);
@@ -103,6 +110,7 @@ void initial(int &height, int &width){
 
 void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
     int a;
+    srand(time(NULL));
     cout << "fill with random data \n";
     for(a=0;a<height*width;a++){
         matrix_dx[a] = rand() % 10;
@@ -125,62 +133,30 @@ void print_matrix(int matrix[]){
 void transpose(int transpose_matrix[], int transposed_matrix[]){
 	int a, b, c;
 	b = 0;
-	c = 0;
+    c = 0;
 	for(a=0;a<height*width;a++){
-		if(a==(width*c)){
-			c++;
+		if(a%width==0){
 			b=0;
-		}
-		transposed_matrix[a] = transpose_matrix[b*height+(c-1)];	
-	}
-}
-
-void untranspose(int matrix[], int transpose_matrix[]){
-	int a, b, c;
-	b = 0;
-	c = 0;
-	for(a=0;a<height*width;a++){
-		if(a==width*c){
-			c++;
-			b=0;
-		}
-		transpose_matrix[b*height+(c-1)] = matrix[a];
+            c++;
+        }
+		transposed_matrix[a] = transpose_matrix[b*height+(c-1)];
+        b++;
 	}
 }
 
 void kernel_filter(int matrix[], int transform_matrix[]){
     //boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
-    int a,b,c,d, x1, x2, x3;
+    int a, x1, x2, x3;
     int kernel[3] = {-1, 0, 1};
-    int * previous_matrix;
-    int * ahead_matrix;
-    
-    previous_matrix = new int [height*width];
-    ahead_matrix = new int [height*width];
-    
+
     for (a=0;a<height*width; a++){
-        previous_matrix[a] = matrix[a-1];
-        ahead_matrix[a] = matrix[a+1];
-    }
-   
-    for (a=0;a<height*width; a++){
-        b=a-1;
-        d=a+1;
-        if (a > 0)
-            x1 = kernel[0] * previous_matrix[a];
+        x1 = (a%width==0) ? 0 : kernel[0] * matrix[a];
         x2 = kernel[1] * matrix[a];
-        x3 = kernel[2] * ahead_matrix[a];
-        
-        if (a%width==0)
-            x1 = 0;
-        else if(a%width==width-1)
-            x3 = 0;
+        x3 = (a%width==width-1) ? 0 : kernel[2] * matrix[a+1];
+
         transform_matrix[a] = x1 + x2 + x3;
     }
- //   delete[] previous_matrix;
- //   delete[] ahead_matrix;
 }
-
 
 void compute_min_and_max(int matrix[]){
     //boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
