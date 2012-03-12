@@ -17,7 +17,7 @@
 using namespace std;
 
 void initial(int &height, int &width);
-void transpose(int matrix[]);
+void transpose(int matrix[], int matrix_transpose[]);
 void kernel_filter(int matrix[], int transform_matrix[]);
 void print_matrix(int matrix[]);
 void fill_with_random_data(int matrix_dx[], int matrix_dy[]);
@@ -30,8 +30,8 @@ int main (int argc, char ** argv)
 {
     initial(height, width); //Ask user to enter size of the matrix
     		
-    int * matrix; //matrix
-    int * matrix_transpose; //matrix_transpose
+    int * matrix; 
+    int * matrix_transpose; 
     int * dx_matrix;
     
     matrix = new int [height*width];
@@ -43,7 +43,8 @@ int main (int argc, char ** argv)
     print_matrix(matrix);
   
     cout << "Transpose Matrix \n";
-    transpose(matrix_transpose);
+    //
+    transpose(matrix, matrix_transpose);
     print_matrix(dy_matrix);
     
     cout << "kernel filter\n";
@@ -51,13 +52,18 @@ int main (int argc, char ** argv)
     boost::thread workertwo(kernel_filter, matrix_transpose, dy_matrix);
     workerone.join();
     workertwo.join();
-
+    
+    delete[] matrix;
+    delete[] matrix_transpose;
+    
+    int * dy_matrix_transpose;
+    dy_matrix_transpose = new int [height*width];
     // kernel filter is applied along a transposed matrix(dy_matrix)
     // values stored in junk_matrix(matrix_dy)
     // matrix_dy is untransposed values place in dy_matrix;
     
     cout << "Untranspose Matrix\n";
-    transpose(dy_matrix);
+    transpose(dy_matrix, dy_matrix_transpose);
     
     cout << "dx_matrix\n";
     print_matrix(dx_matrix);
@@ -70,8 +76,6 @@ int main (int argc, char ** argv)
     workerthree.join();
     workerfour.join();
     
-    delete[] matrix;
-    delete[] matrix_transpose;
     delete[] dx_matrix;
     delete[] dy_matrix;
     return 0;
@@ -96,12 +100,12 @@ void initial(int &height, int &width){
 }
 
 void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
-    int a;
+    int i;
     srand(time(NULL));
     cout << "fill with random data \n";
-    for(a=0;a<height*width;a++){
-        matrix_dx[a] = rand() % 10;
-        matrix_dy[a] = matrix_dx[a];
+    for(i=0;i<height*width;i++){
+        matrix_dx[i] = rand() % 10;
+        matrix_dy[i] = matrix_dx[i];
     }
 }
 
@@ -117,35 +121,31 @@ void print_matrix(int matrix[]){
     }
 }
 
-void transpose(int matrix[]){
-	int a, b, c; 			/* Counters */
+void transpose(int matrix[], int matrix_transpose[]){
+	int i, b, c; 			/* Counters */
 	b = 0;				    /* Column # */
     c = 0;				    /* Row #    */
-    int * junk_matrix;
-    junk_matrix = new int [height*width];
-	for(a=0;a<height*width;a++){
-		if(a%width==0){
+	for(i=0;i<height*width;i++){
+		if(i%width==0){
 			b=0;
             c++;
         }
-		junk_matrix[a] = matrix[b*height+(c-1)];
+		matrix_transpose[i] = matrix[b*height+(c-1)];
         b++;
 	}
-    for(a=0;a<height*width;a++)
-        matrix[a] = junk_matrix[a];
 }
 
 void kernel_filter(int matrix[], int transform_matrix[]){
     boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
-    int a, x1, x2, x3;
+    int i, x1, x2, x3;
     int kernel[3] = {-1, 0, 1};
 
-    for (a=0;a<height*width; a++){
-        x1 = (a%width==0) ? 0 : kernel[0] * matrix[a-1];
-        x2 = kernel[1] * matrix[a];
-        x3 = (a%width==width-1) ? 0 : kernel[2] * matrix[a+1];
+    for (i=0;i<height*width; i++){
+        x1 = (i%width==0) ? 0 : kernel[0] * matrix[i-1];
+        x2 = kernel[1] * matrix[i];
+        x3 = (i%width==width-1) ? 0 : kernel[2] * matrix[i+1];
 
-        transform_matrix[a] = x1 + x2 + x3;
+        transform_matrix[i] = x1 + x2 + x3;
     }
 }
 
