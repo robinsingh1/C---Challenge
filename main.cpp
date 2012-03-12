@@ -53,7 +53,7 @@ int main (int argc, char ** argv)
     cout << "Transpose Matrix \n";
     transpose(matrix_dy, dy_matrix);
     
-		print_matrix(dy_matrix);
+    print_matrix(dy_matrix);
     boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
     boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
     workerone.join();
