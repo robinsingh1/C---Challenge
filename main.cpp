@@ -45,23 +45,16 @@ int main (int argc, char ** argv)
     fill_with_random_data(matrix_dx, matrix_dy);
     print_matrix(matrix_dx);
     
-    cout << "kernel filter\n";
-    // matrix_dy original matrix
-    // matrix_dy is turned and placed into dy_matrix
-    // now dy_matrix has been transposed 
-    // matrix_dy original but junk
-    
+  
     cout << "Transpose Matrix \n";
     transpose(matrix_dy, dy_matrix);
     
     print_matrix(dy_matrix);
+    cout << "kernel filter\n";
     boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
     boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
     workerone.join();
     workertwo.join();
-    
-    //kernel_filter(matrix_dx, dx_matrix);
-    //kernel_filter(dy_matrix, matrix_dy);
 
     // kernel filter is applied along a transposed matrix(dy_matrix)
     // values stored in junk_matrix(matrix_dy)
