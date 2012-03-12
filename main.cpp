@@ -181,8 +181,8 @@ void kernel_filter(int matrix[], int transform_matrix[]){
             x3 = 0;
         transform_matrix[a] = x1 + x2 + x3;
     }
-    delete[] previous_matrix;
-    delete[] ahead_matrix;
+ //   delete[] previous_matrix;
+ //   delete[] ahead_matrix;
 }
 
 
