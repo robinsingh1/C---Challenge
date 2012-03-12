@@ -158,14 +158,11 @@ void kernel_filter(int matrix[], int transform_matrix[]){
     previous_matrix = new int [height*width];
     ahead_matrix = new int [height*width];
     
-    
-    c=0;
     for (a=0;a<height*width; a++){
-        //cout << matrix[a] << ",";
         previous_matrix[a] = matrix[a-1];
         ahead_matrix[a] = matrix[a+1];
     }
-    //cout << "\n\n";
+   
     for (a=0;a<height*width; a++){
         b=a-1;
         d=a+1;
@@ -174,10 +171,9 @@ void kernel_filter(int matrix[], int transform_matrix[]){
         x2 = kernel[1] * matrix[a];
         x3 = kernel[2] * ahead_matrix[a];
         
-        if (a == width*c){
+        if (a%width==0)
             x1 = 0;
-            c++; //row  #
-        } else if (a == width*c-1)
+        else if(a%width==width-1)
             x3 = 0;
         transform_matrix[a] = x1 + x2 + x3;
     }
