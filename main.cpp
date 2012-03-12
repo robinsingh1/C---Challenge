@@ -31,7 +31,7 @@ int * dy_matrix;
 int main (int argc, char ** argv)
 {
     initial(height, width);
-    
+		
 		int * matrix_dx;
     int * matrix_dy;
     int * dx_matrix;
@@ -54,8 +54,8 @@ int main (int argc, char ** argv)
     transpose(matrix_dy, dy_matrix);
     
 		print_matrix(dy_matrix);
- 	  	boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
-    	boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
+ 	  boost::thread workerone(kernel_filter, matrix_dx, dx_matrix);
+    boost::thread workertwo(kernel_filter, dy_matrix, matrix_dy);
     workerone.join();
     workertwo.join();
     
@@ -67,7 +67,7 @@ int main (int argc, char ** argv)
     // matrix_dy is untransposed values place in dy_matrix;
     
 		cout << "Untranspose Matrix\n";
-  	  transpose(matrix_dy, dy_matrix);
+  	transpose(matrix_dy, dy_matrix);
   
     cout << "dx_matrix\n";
     print_matrix(dx_matrix);
@@ -75,8 +75,8 @@ int main (int argc, char ** argv)
     print_matrix(dy_matrix);
     
 		cout << "compute min and max\n";
-    	boost::thread workerthree(compute_min_and_max,dx_matrix);
-    	boost::thread workerfour(compute_min_and_max,dy_matrix);
+    boost::thread workerthree(compute_min_and_max,dx_matrix);
+    boost::thread workerfour(compute_min_and_max,dy_matrix);
     workerthree.join();
     workerfour.join();
     
