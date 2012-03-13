@@ -40,14 +40,11 @@ int main (int argc, char ** argv)
     dy_matrix = new int [height*width];
     
     fill_with_random_data(matrix, matrix_transpose);
-    print_matrix(matrix);
-  
-    cout << "Transpose Matrix \n";
-    //
-    transpose(matrix, matrix_transpose);
-    print_matrix(dy_matrix);
     
-    cout << "kernel filter\n";
+    cout << "Transpose Matrix \n";
+    transpose(matrix, matrix_transpose);
+
+    cout << "Apply kernel filter\n";
     boost::thread workerone(kernel_filter, matrix, dx_matrix);
     boost::thread workertwo(kernel_filter, matrix_transpose, dy_matrix);
     workerone.join();
@@ -58,17 +55,9 @@ int main (int argc, char ** argv)
     
     int * dy_matrix_transpose;
     dy_matrix_transpose = new int [height*width];
-    // kernel filter is applied along a transposed matrix(dy_matrix)
-    // values stored in junk_matrix(matrix_dy)
-    // matrix_dy is untransposed values place in dy_matrix;
     
     cout << "Untranspose Matrix\n";
     transpose(dy_matrix, dy_matrix_transpose);
-    
-    cout << "dx_matrix\n";
-    print_matrix(dx_matrix);
-    cout << "\ndy_matrix\n";
-    print_matrix(dy_matrix);
     
     cout << "compute min and max\n";
     boost::thread workerthree(compute_min_and_max , dx_matrix);
@@ -90,13 +79,11 @@ int main (int argc, char ** argv)
 
 void initial(int &height, int &width){
     cout << "Please enter the height : ";
-    //cin >> height;
+    cin >> height;
     cout << "Thanks\n";
     cout << "Please enter the width : ";
-    //cin >> width;
+    cin >> width;
     cout << "Thanks\n";
-    height = 4;
-    width = 4;
 }
 
 void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
@@ -108,7 +95,7 @@ void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
         matrix_dy[i] = matrix_dx[i];
     }
 }
-
+/*
 void print_matrix(int matrix[]){
     int h, x=1;
     int a = 0;
@@ -120,7 +107,7 @@ void print_matrix(int matrix[]){
         }
     }
 }
-
+*/
 void transpose(int matrix[], int matrix_transpose[]){
 	int i, b, c; 			/* Counters */
 	b = 0;				    /* Column # */
@@ -151,15 +138,15 @@ void kernel_filter(int matrix[], int transform_matrix[]){
 
 void compute_min_and_max(int matrix[]){
     boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
-    int max_val, min_val, a;
+    int max_val, min_val, i;
    
     min_val = matrix[0];
     max_val = matrix[0];
-    for (a=0;a<width*height; a++){
-        if (matrix[a] < min_val)
-            min_val = matrix[a];
-        if (matrix[a] > max_val)
-            max_val = matrix[a];
+    for (i=0;i<width*height; i++){
+        if (matrix[i] < min_val)
+            min_val = matrix[i];
+        if (matrix[i] > max_val)
+            max_val = matrix[i];
     }
     cout << "The min value is equal to " << min_val << endl;
     cout << "The max value is equal to " << max_val << endl;
