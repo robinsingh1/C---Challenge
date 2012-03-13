@@ -4,7 +4,7 @@
 //
 //  Created by Robin Singh on 12-02-04.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+//  Email: robin.singh.1991@gmail.com
 
 #include <boost/thread.hpp>
 #include <boost/timer/timer.hpp>
