@@ -16,52 +16,49 @@
 
 using namespace std;
 
-void initial(int &height, int &width);
-void transpose(int matrix[], int matrix_transpose[]);
-void kernel_filter(int matrix[], int transform_matrix[]);
-void print_matrix(int matrix[]);
-void fill_with_random_data(int matrix_dx[], int matrix_dy[]);
-void compute_min_and_max(int matrix[]);
+void transpose(unsigned char matrix[], unsigned char matrix_transpose[]);
+void kernel_filter(unsigned char matrix[], unsigned char transform_matrix[]);
+void fill_with_random_data(unsigned char matrix_dx[], unsigned char matrix_dy[]);
+void compute_min_and_max(unsigned char matrix[]);
 
 int height=0;
 int width=0;
-int * dy_matrix;
+unsigned char * dy_matrix;
+
 int main (int argc, char ** argv)
 {
-    initial(height, width); //Ask user to enter size of the matrix
-    		
-    int * matrix; 
-    int * matrix_transpose; 
-    int * dx_matrix;
-    
-    matrix = new int [height*width];
-    matrix_transpose = new int [height*width];
-    dx_matrix = new int [height*width];
-    dy_matrix = new int [height*width];
-    
-    fill_with_random_data(matrix, matrix_transpose);
-    
-    cout << "Transpose Matrix \n";
-    transpose(matrix, matrix_transpose);
+  	width = atoi(argv[1]);
+		height = atoi(argv[2]);
 
+		unsigned char * M; 
+    unsigned char * M_transpose; 
+    unsigned char * dx_matrix;
+    
+    M = new unsigned char [height*width];
+    M_transpose = new unsigned char [height*width];
+    dx_matrix = new unsigned char [height*width];
+    dy_matrix = new unsigned char [height*width];
+    
+    fill_with_random_data(M, M_transpose);
+    transpose(M, M_transpose);
     cout << "Apply kernel filter\n";
-    boost::thread workerone(kernel_filter, matrix, dx_matrix);
-    boost::thread workertwo(kernel_filter, matrix_transpose, dy_matrix);
+    boost::thread workerone(kernel_filter, M, dx_matrix);
+    boost::thread workertwo(kernel_filter, M_transpose, dy_matrix);
     workerone.join();
     workertwo.join();
     
-    delete[] matrix;
-    delete[] matrix_transpose;
+    delete[] M;
+    delete[] M_transpose;
     
-    int * dy_matrix_transpose;
-    dy_matrix_transpose = new int [height*width];
+    unsigned char * dy_matrix_transpose;
+    dy_matrix_transpose = new unsigned char [height*width];
     
     cout << "Untranspose Matrix\n";
     transpose(dy_matrix, dy_matrix_transpose);
     
     cout << "compute min and max\n";
     boost::thread workerthree(compute_min_and_max , dx_matrix);
-    boost::thread workerfour(compute_min_and_max,dy_matrix);
+    boost::thread workerfour(compute_min_and_max, dy_matrix_transpose);
     workerthree.join();
     workerfour.join();
     
@@ -77,16 +74,7 @@ int main (int argc, char ** argv)
 //********************************************
 //********************************************
 
-void initial(int &height, int &width){
-    cout << "Please enter the height : ";
-    cin >> height;
-    cout << "Thanks\n";
-    cout << "Please enter the width : ";
-    cin >> width;
-    cout << "Thanks\n";
-}
-
-void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
+void fill_with_random_data(unsigned char matrix_dx[], unsigned char matrix_dy[]){
     int i;
     srand(time(NULL));
     cout << "fill with random data \n";
@@ -95,20 +83,8 @@ void fill_with_random_data(int matrix_dx[], int matrix_dy[]){
         matrix_dy[i] = matrix_dx[i];
     }
 }
-/*
-void print_matrix(int matrix[]){
-    int h, x=1;
-    int a = 0;
-    for(h=0;h<height*width;h++){
-        cout << matrix[a + h] << " ";
-        if (h == (width*x-1)){
-            cout << "\n";
-            x++;
-        }
-    }
-}
-*/
-void transpose(int matrix[], int matrix_transpose[]){
+
+void transpose(unsigned char matrix[], unsigned char matrix_transpose[]){
 	int i, b, c; 			/* Counters */
 	b = 0;				    /* Column # */
     c = 0;				    /* Row #    */
@@ -122,7 +98,7 @@ void transpose(int matrix[], int matrix_transpose[]){
 	}
 }
 
-void kernel_filter(int matrix[], int transform_matrix[]){
+void kernel_filter(unsigned char matrix[], unsigned char transform_matrix[]){
     boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
     int i, x1, x2, x3;
     int kernel[3] = {-1, 0, 1};
@@ -136,7 +112,7 @@ void kernel_filter(int matrix[], int transform_matrix[]){
     }
 }
 
-void compute_min_and_max(int matrix[]){
+void compute_min_and_max(unsigned char matrix[]){
     boost::timer::auto_cpu_timer t("%t sec CPU, %w sec real\n");
     int max_val, min_val, i;
    
